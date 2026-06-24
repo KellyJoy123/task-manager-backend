@@ -7,7 +7,7 @@ import { CreateTaskUseCase } from './application/use-cases/create-task.use-case'
 import { GetTasksUseCase } from './application/use-cases/get-task.use-case';
 import { UpdateTaskUseCase } from './application/use-cases/update-task.use-case';
 import { DeleteTaskUseCase } from './application/use-cases/delete-task.use-case';
-import { ToggleTaskStatusUseCase } from './application/use-cases/toggle-task.use.case';
+import { ToggleTaskStatusUseCase } from './application/use-cases/toggle-task.use-case';
 
 @Module({
   imports: [

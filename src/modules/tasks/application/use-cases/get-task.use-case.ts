@@ -9,8 +9,8 @@ export class GetTasksUseCase {
     private readonly taskRepository: TaskRepository,
   ) {}
 
-  async execute(): Promise<TaskResponseDto[]> {
-    const tasks = await this.taskRepository.findAll();
+  async execute(userId: string): Promise<TaskResponseDto[]> {
+    const tasks = await this.taskRepository.findAll(userId);
     return tasks.map((task) => TaskMapper.toResponseDto(task));
   }
 }

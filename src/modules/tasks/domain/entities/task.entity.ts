@@ -3,11 +3,13 @@ export class Task {
   title: string;
   description?: string;
   completed: boolean;
+  userId: string;
   createdAt: Date;
   updatedAt?: Date;
 
-  constructor(title: string, description?: string) {
+  constructor(title: string, userId: string, description?: string) {
     this.title = title;
+    this.userId = userId;
     this.description = description;
     this.completed = false;
     this.createdAt = new Date();

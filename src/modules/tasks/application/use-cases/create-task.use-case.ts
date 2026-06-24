@@ -11,8 +11,8 @@ export class CreateTaskUseCase {
     private readonly taskRepository: TaskRepository,
   ) {}
 
-  async execute(createTaskDto: CreateTaskDto): Promise<TaskResponseDto> {
-    const task = new Task(createTaskDto.title, createTaskDto.description);
+  async execute(createTaskDto: CreateTaskDto, userId: string): Promise<TaskResponseDto> {
+    const task = new Task(createTaskDto.title, userId, createTaskDto.description);
     const createdTask = await this.taskRepository.create(task);
     return TaskMapper.toResponseDto(createdTask);
   }

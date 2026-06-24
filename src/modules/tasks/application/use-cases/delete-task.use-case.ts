@@ -8,8 +8,8 @@ export class DeleteTaskUseCase {
     private readonly taskRepository: TaskRepository,
   ) {}
 
-  async execute(id: string): Promise<void> {
-    const exists = await this.taskRepository.exists(id);
+  async execute(id: string, userId: string): Promise<void> {
+    const exists = await this.taskRepository.exists(id, userId);
     if (!exists) {
       throw new NotFoundException(`Tarea con ID ${id} no encontrada`);
     }

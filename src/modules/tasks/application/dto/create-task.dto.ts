@@ -6,7 +6,7 @@ export class CreateTaskDto {
   @MaxLength(100, {message: "El título no puede exceder más de 100 caracteres"})
   @Matches(/\S/, { message: 'El título no puede estar vacío o contener solo espacios' })
   @Matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El título solo puede contener letras, números y espacios' })
-  title: string;
+title!: string;
 
   @IsOptional()
   @IsString()

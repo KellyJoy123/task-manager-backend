@@ -4,7 +4,8 @@ import { CreateTaskUseCase } from '../src/modules/tasks/application/use-cases/cr
 import { GetTasksUseCase } from '../src/modules/tasks/application/use-cases/get-task.use-case';
 import { UpdateTaskUseCase } from '../src/modules/tasks/application/use-cases/update-task.use-case';
 import { DeleteTaskUseCase } from '../src/modules/tasks/application/use-cases/delete-task.use-case';
-import { ToggleTaskStatusUseCase } from '../src/modules/tasks/application/use-cases/toggle-task.use.case';
+import { ToggleTaskStatusUseCase } from './modules/tasks/application/use-cases/toggle-task.use-case';
+import { beforeEach, describe } from 'node:test';
 
 describe('TasksController', () => {
   let controller: TasksController;

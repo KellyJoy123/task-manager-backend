@@ -9,6 +9,8 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CreateTaskDto } from '../../application/dto/create-task.dto';
 import { UpdateTaskDto } from '../../application/dto/update-task.dto';
@@ -17,9 +19,12 @@ import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-c
 import { GetTasksUseCase } from '../../application/use-cases/get-task.use-case';
 import { UpdateTaskUseCase } from '../../application/use-cases/update-task.use-case';
 import { DeleteTaskUseCase } from '../../application/use-cases/delete-task.use-case';
-import { ToggleTaskStatusUseCase } from '../../application/use-cases/toggle-task.use.case';
+import { ToggleTaskStatusUseCase } from '../../application/use-cases/toggle-task.use-case';
+import { JwtAuthGuard } from 'src/modules/auth/presentation/guards/jwt-auth.guard';
+import { use } from 'passport';
 
 @Controller('api/tasks')
+@UseGuards(JwtAuthGuard)
 export class TasksController {
   constructor(
     private readonly createTaskUseCase: CreateTaskUseCase,
@@ -30,31 +35,43 @@ export class TasksController {
   ) {}
 
   @Get()
-  async getAll(): Promise<TaskResponseDto[]> {
-    return this.getTasksUseCase.execute();
+  async getAll(@Request() req): Promise<TaskResponseDto[]> {
+    const userId = req.user.userId;
+    return this.getTasksUseCase.execute(userId);
   }
 
   @Post()
-  async create(@Body() createTaskDto: CreateTaskDto): Promise<TaskResponseDto> {
-    return this.createTaskUseCase.execute(createTaskDto);
+  async create(@Body() createTaskDto: CreateTaskDto, @Request() req,): Promise<TaskResponseDto> {
+    const userId = req.user.userId;
+    return this.createTaskUseCase.execute(createTaskDto, userId);
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
+    @Request() req,
   ): Promise<TaskResponseDto> {
-    return this.updateTaskUseCase.execute(id, updateTaskDto);
+    const userId = req.user.userId;
+    return this.updateTaskUseCase.execute(id, updateTaskDto, userId);
   }
 
   @Patch(':id/toggle')
-  async toggleStatus(@Param('id') id: string): Promise<TaskResponseDto> {
-    return this.toggleTaskStatusUseCase.execute(id);
+  async toggleStatus(
+    @Param('id') id: string,
+    @Request() req,
+    ): Promise<TaskResponseDto> {
+    const userId = req.user.userId;
+    return this.toggleTaskStatusUseCase.execute(id, userId);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string): Promise<void> {
-    await this.deleteTaskUseCase.execute(id);
+  async delete(
+    @Param('id') id: string,
+    @Request() req,
+    ): Promise<void> {
+    const userId = req.user.userId;
+    await this.deleteTaskUseCase.execute(id, userId);
   }
 }

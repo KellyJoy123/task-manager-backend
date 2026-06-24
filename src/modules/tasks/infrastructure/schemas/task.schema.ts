@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true})
 export class TaskDocument extends Document {
@@ -11,6 +11,9 @@ export class TaskDocument extends Document {
 
   @Prop({ default: false })
   completed: boolean;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
+  userId: Types.ObjectId;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;

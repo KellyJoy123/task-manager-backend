@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Task } from '../../domain/entities/task.entity';
 import { ITaskRepository } from '../../domain/interfaces/task.repository.interface';
 import { TaskDocument } from '../schemas/task.schema';
@@ -13,7 +13,11 @@ export class TaskRepository implements ITaskRepository {
   ) {}
 
   private toDomain(document: TaskDocument): Task {
-    const task = new Task(document.title, document.description);
+    const task = new Task(
+      document.title, 
+       document.userId.toString(),
+      document.description, 
+    );
     Object.assign(task, {
       id: document._id.toString(),
       completed: document.completed,
@@ -28,6 +32,7 @@ export class TaskRepository implements ITaskRepository {
       title: task.title,
       description: task.description,
       completed: task.completed,
+      userId: new Types.ObjectId(task.userId),
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };
@@ -39,40 +44,38 @@ export class TaskRepository implements ITaskRepository {
     return doc;
   }
 
-  async findAll(): Promise<Task[]> {
-    const documents = await this.taskModel.find().sort({ createdAt: -1 }).exec();
+  async findAll(userId: string): Promise<Task[]> {
+    const documents = await this.taskModel
+      .find({ userId: new Types.ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .exec();
     return documents.map((doc) => this.toDomain(doc));
   }
 
-  async findById(id: string): Promise<Task | null> {
-    const document = await this.taskModel.findById(id).exec();
+  async findById(id: string, userId: string): Promise<Task | null> {
+    const document = await this.taskModel
+      .findOne({ _id: id, userId: new Types.ObjectId(userId) })
+      .exec();
     if (!document) return null;
     return this.toDomain(document);
   }
 
   async create(task: Task): Promise<Task> {
-    const document = new this.taskModel({
-      title: task.title,
-      description: task.description,
-      completed: task.completed,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-    });
-    
+    const document = new this.taskModel(this.toDocument(task));
     const savedDocument = await document.save();
     return this.toDomain(savedDocument);
   }
 
   async update(task: Task): Promise<Task> {
     const updatedDocument = await this.taskModel
-      .findByIdAndUpdate(
-        task.id, 
+     .findOneAndUpdate(
+        { _id: task.id, userId: new Types.ObjectId(task.userId) },
         {
           title: task.title,
           description: task.description,
           completed: task.completed,
           updatedAt: task.updatedAt,
-        }, 
+        },
         { new: true }
       )
       .exec();
@@ -85,8 +88,10 @@ export class TaskRepository implements ITaskRepository {
     await this.taskModel.findByIdAndDelete(id).exec();
   }
 
-  async exists(id: string): Promise<boolean> {
-    const count = await this.taskModel.countDocuments({ _id: id }).exec();
+  async exists(id: string, userId: string): Promise<boolean> {
+    const count = await this.taskModel
+      .countDocuments({ _id: id, userId: new Types.ObjectId(userId) })
+      .exec();
     return count > 0;
   }
 }
